@@ -5,48 +5,48 @@
 
 #define WIDTH 800
 #define HEIGHT 450
-#define SPACING 35.0f
+#define SPACING 50.0f
 #define N (3*WIDTH/SPACING + 1)
 
 Vector2 foo[800];
 Vector2 doofoo[800];
-//linear function
+Vector2 labubu[800];
+Vector2 damru[800];
 void bar(){
   for(int i = 0;i<800;i++){
     float val = cexp((float)7*i/800);
-    foo[i].x = (float)WIDTH/2 + i;
-    doofoo[i].x = (float)WIDTH/2 + i;
-    foo[i].y = (float)HEIGHT/2 - i;
-    doofoo[i].y = (float)HEIGHT/2 - val;
+    foo[i].x =   i;
+    doofoo[i].x =   i;
+    foo[i].y =  -i;
+    doofoo[i].y =  -val;
+    labubu[i].x =   i;
+    labubu[i].y =  (float) -1*i*i/WIDTH;
+    damru[i].x =   i;
+    damru[i].y =  -50*cosf(i/(8*PI)); 
+    if(fabsf(doofoo[i].y - foo[i].y) < 0.01f)DrawCircleV(foo[i],10,RED);
   }
 }
 
-int makeGrid(float spacing){
-  float midx = (float) WIDTH/2;
-  float midy = (float) HEIGHT/2;
-  int numero = 0;
-  for(float x =midx;x<=2*WIDTH;x+= spacing){
-    if(x == midx)
-      DrawLineEx((Vector2){(float)WIDTH/2,(float)-HEIGHT}, (Vector2){(float)WIDTH/2,(float)2*HEIGHT},3.0f,WHITE);
-    else
-      DrawLine(x,-HEIGHT,x,2*HEIGHT,RAYWHITE);
-    numero++;
+void upgradedGrid(Camera2D camera,float spacing){
+  int width = GetScreenWidth();
+  int height = GetScreenHeight();
+
+  Vector2 topLeft = GetScreenToWorld2D((Vector2){0,0}, camera);
+  Vector2 bottomRight = GetScreenToWorld2D((Vector2){width,height}, camera);
+
+  float startX = floorf(topLeft.x / spacing) * spacing;
+  float startY = floorf(topLeft.y / spacing) * spacing;
+
+  for (float x = startX; x <= bottomRight.x; x += spacing) {
+    float thickness = (fabsf(x) < 0.1f) ? 3.0f : 1.0f; 
+    Color col = (fabsf(x) < 0.1f) ? WHITE : DARKGRAY;
+    DrawLineEx((Vector2){ x, topLeft.y }, (Vector2){ x, bottomRight.y }, thickness, col);
   }
-  for(float x = midx;x>=-WIDTH;x-= spacing){
-    if(x == midx)continue;
-    DrawLine(x,-HEIGHT,x,2*HEIGHT,RAYWHITE);
-    numero++;
+  for (float y = startY; y <= bottomRight.y; y += spacing) {
+    float thickness = (fabsf(y) < 0.1f) ? 3.0f : 1.0f; // Thicker line for the X-axis (y=0)
+    Color col = (fabsf(y) < 0.1f) ? WHITE : DARKGRAY;
+    DrawLineEx((Vector2){ topLeft.x, y }, (Vector2){ bottomRight.x, y }, thickness, col);
   }
-  for(float y = midy;y<=2*HEIGHT;y+= spacing){
-    if(y == midy)
-      DrawLineEx((Vector2){(float)-WIDTH,(float)HEIGHT/2},(Vector2){(float)2*WIDTH,(float)HEIGHT/2},3.0f,WHITE);
-    else
-      DrawLine(-WIDTH, y,2*WIDTH,y,RAYWHITE);
-  }
-  for(float y = midy;y>=-HEIGHT;y-= spacing){
-    DrawLine(-WIDTH, y,2*WIDTH,y,RAYWHITE);
-  }
-  return numero;
 }
 
 int count = 0;
@@ -56,14 +56,14 @@ int main() {
   InitWindow(WIDTH,HEIGHT, "DrawGrid Example");
   Camera2D camera = {0};
   camera.offset = (Vector2){400, 225};
-  camera.target = (Vector2){(float)WIDTH/2, (float)HEIGHT/2};
+  camera.target = (Vector2){0, 0};
   camera.zoom = 1.0f;
   SetTargetFPS(60);
 
   while (!WindowShouldClose()) {
     int width = GetScreenWidth();
     int height = GetScreenHeight();
-    camera.zoom += GetMouseWheelMove() * 0.1f;
+    camera.zoom += GetMouseWheelMove() * 0.2f;
     if (camera.zoom < 0.1f) camera.zoom = 0.1f;
     if(IsKeyPressed(KEY_Q))break;
     if (IsKeyDown(KEY_RIGHT)) camera.target.x += 5;
@@ -74,14 +74,11 @@ int main() {
     ClearBackground(BLACK);
     BeginMode2D(camera);
       bar();
-      int curr = makeGrid(SPACING);
-      if(count != curr){
-        count = curr;
-        printf("%d\n",count);
-        printf("%d\n",(int)(3*WIDTH/SPACING + 1));
-      }
+      upgradedGrid(camera,SPACING);
       DrawLineStrip(foo,800-1,GOLD);
       DrawLineStrip(doofoo,800-1,LIME);
+      DrawLineStrip(labubu,800-1,SKYBLUE);
+      DrawLineStrip(damru,800-1,RED);
       
     EndMode2D();
     EndDrawing();
