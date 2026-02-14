@@ -5,7 +5,7 @@
 
 #define WIDTH 800
 #define HEIGHT 450
-#define SPACING 50.0f
+#define SPACING 30.0f
 #define N (3*WIDTH/SPACING + 1)
 
 Vector2 foo[800];
@@ -27,6 +27,18 @@ void bar(){
   }
 }
 
+void DrawMathFunction(Camera2D camera) {
+  Vector2 points[800];
+  int width = GetScreenWidth();
+  for (int i = 0; i < width && i < 800; i++) {
+    Vector2 worldPos = GetScreenToWorld2D((Vector2){ (float)i, 0 }, camera);
+    float x = worldPos.x / SPACING; 
+    float y = x*SPACING;  
+    points[i] = (Vector2){ worldPos.x, -y }; 
+  }
+  DrawLineStrip(points, 800, LIME);
+}
+
 void upgradedGrid(Camera2D camera,float spacing){
   int width = GetScreenWidth();
   int height = GetScreenHeight();
@@ -42,6 +54,7 @@ void upgradedGrid(Camera2D camera,float spacing){
     Color col = (fabsf(x) < 0.1f) ? WHITE : DARKGRAY;
     DrawLineEx((Vector2){ x, topLeft.y }, (Vector2){ x, bottomRight.y }, thickness, col);
   }
+
   for (float y = startY; y <= bottomRight.y; y += spacing) {
     float thickness = (fabsf(y) < 0.1f) ? 3.0f : 1.0f; // Thicker line for the X-axis (y=0)
     Color col = (fabsf(y) < 0.1f) ? WHITE : DARKGRAY;
@@ -73,7 +86,8 @@ int main() {
     BeginDrawing();
     ClearBackground(BLACK);
     BeginMode2D(camera);
-      bar();
+      // bar();
+      DrawMathFunction(camera);
       upgradedGrid(camera,SPACING);
       DrawLineStrip(foo,800-1,GOLD);
       DrawLineStrip(doofoo,800-1,LIME);
