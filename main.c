@@ -1,9 +1,9 @@
 #define PLUG_IMPLEMENTATION
 #include "plug.h"
 
-int main() {
+int main(int argc,char *argv[]) {
   SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-  InitWindow(WIDTH,HEIGHT, "DrawGrid Example");
+  InitWindow(WIDTH,HEIGHT, "Function Plotter");
   Camera2D camera = {0};
   camera.offset = (Vector2){400, 225};
   camera.target = (Vector2){0, 0};
@@ -28,7 +28,6 @@ int main() {
     BeginDrawing();
     ClearBackground(BLACK);
     BeginMode2D(camera);
-
       ScreenGrid(camera,SPACING);
       DrawMathFunction(camera);
       directions(camera);

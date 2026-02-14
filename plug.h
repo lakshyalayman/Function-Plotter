@@ -23,7 +23,7 @@ void DrawMathFunction(Camera2D camera) {
   for (int i = 0; i < width; i++) {
     Vector2 worldPos = GetScreenToWorld2D((Vector2){ (float)i, 0 }, camera);
     float x = worldPos.x / SPACING; 
-    float y = (x*x)*SPACING;  
+    float y = (2*x)*SPACING;  
     points[i] = (Vector2){ worldPos.x, -y }; 
   }
   DrawLineStrip(points, width, LIME);
@@ -32,7 +32,8 @@ void DrawMathFunction(Camera2D camera) {
 void directions(Camera2D camera){
   Vector2 pos = GetScreenToWorld2D((Vector2){0,0}, camera);
   DrawText(TextFormat("X: %f",camera.target.x),pos.x,pos.y,20,BLUE);
-  DrawText(TextFormat("Y: %f",camera.target.y),pos.x,pos.y+20,20,BLUE);
+  DrawText(TextFormat("Y: %f",-1.0f * (camera.target.y)),pos.x,pos.y+20,20,BLUE);
+  DrawCircle(camera.target.x,camera.target.y,2,RED);
 }
 
 void ScreenGrid(Camera2D camera,float spacing){
