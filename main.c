@@ -1,3 +1,5 @@
+#include <complex.h>
+#include <math.h>
 #include <stdio.h>
 #include <raylib.h>
 
@@ -6,12 +8,16 @@
 #define SPACING 35.0f
 #define N (3*WIDTH/SPACING + 1)
 
-Vector2 foo[1600];
+Vector2 foo[800];
+Vector2 doofoo[800];
 //linear function
 void bar(){
-  for(int i = 0;i<1600;i++){
+  for(int i = 0;i<800;i++){
+    float val = cexp((float)7*i/800);
     foo[i].x = (float)WIDTH/2 + i;
+    doofoo[i].x = (float)WIDTH/2 + i;
     foo[i].y = (float)HEIGHT/2 - i;
+    doofoo[i].y = (float)HEIGHT/2 - val;
   }
 }
 
@@ -74,7 +80,8 @@ int main() {
         printf("%d\n",count);
         printf("%d\n",(int)(3*WIDTH/SPACING + 1));
       }
-      DrawLineStrip(foo,1600-1,SKYBLUE);
+      DrawLineStrip(foo,800-1,GOLD);
+      DrawLineStrip(doofoo,800-1,LIME);
       
     EndMode2D();
     EndDrawing();
