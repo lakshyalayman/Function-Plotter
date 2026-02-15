@@ -4,6 +4,8 @@
 #include <raylib.h>
 #include <math.h>
 #include <complex.h>
+#include "tinyexpr.h"
+#include <stdio.h>
 
 #define WIDTH 800
 #define HEIGHT 450
@@ -11,28 +13,39 @@
 #define N (3*WIDTH/SPACING + 1)
 
 void directions(Camera2D camera);
-void DrawMathFunction(Camera2D camera);
+void DrawMathFunction(Camera2D camera,char *stringFunction);
 void ScreenGrid(Camera2D camera,float spacing);
 
 #endif // !PLUG_H
 #ifdef PLUG_IMPLEMENTATION
 
-void DrawMathFunction(Camera2D camera) {
+void DrawMathFunction(Camera2D camera,char *stringFunction) {
   int width = GetScreenWidth();
+  double x_var = 0;
   Vector2 points[width];
-  for (int i = 0; i < width; i++) {
-    Vector2 worldPos = GetScreenToWorld2D((Vector2){ (float)i, 0 }, camera);
-    float x = worldPos.x / SPACING; 
-    float y = (2*x)*SPACING;  
-    points[i] = (Vector2){ worldPos.x, -y }; 
+  bool marker = false;
+  te_variable vars[] = {
+    {"x",&x_var}
+  };
+  int err;
+  te_expr *userFunction = te_compile(stringFunction,vars,1,&err);
+  if(userFunction){
+    for (int i = 0; i < width; i++) {
+      Vector2 worldPos = GetScreenToWorld2D((Vector2){ (float)i, 0 }, camera);
+      x_var = worldPos.x / SPACING; 
+      float y = te_eval(userFunction)*SPACING;
+      points[i] = (Vector2){ worldPos.x, -y }; 
+    }
+    te_free(userFunction);
+    if(!marker)DrawLineStrip(points, width,GOLD);
+  }else{
+    int width = GetScreenWidth();
+    int height = GetScreenHeight();
+    DrawText("code broke",(float)width/2,(float)height/2,30,RED);
   }
-  DrawLineStrip(points, width, LIME);
 }
 
 void directions(Camera2D camera){
-  Vector2 pos = GetScreenToWorld2D((Vector2){0,0}, camera);
-  DrawText(TextFormat("X: %f",camera.target.x),pos.x,pos.y,20,BLUE);
-  DrawText(TextFormat("Y: %f",-1.0f * (camera.target.y)),pos.x,pos.y+20,20,BLUE);
   DrawCircle(camera.target.x,camera.target.y,2,RED);
 }
 

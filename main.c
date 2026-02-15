@@ -2,6 +2,10 @@
 #include "plug.h"
 
 int main(int argc,char *argv[]) {
+  if(argc == 1){
+    printf("BAD USAGE: ./run.sh \"function\"");
+    return -1;
+  }
   SetConfigFlags(FLAG_WINDOW_RESIZABLE);
   InitWindow(WIDTH,HEIGHT, "Function Plotter");
   Camera2D camera = {0};
@@ -11,11 +15,10 @@ int main(int argc,char *argv[]) {
   SetTargetFPS(60);
 
   while (!WindowShouldClose()) {
-    int width = GetScreenWidth();
-    int height = GetScreenHeight();
+    camera.offset = (Vector2){ GetScreenWidth()/2.0f, GetScreenHeight()/2.0f };
     camera.zoom += GetMouseWheelMove() * 0.2f;
     if (camera.zoom < 0.1f) camera.zoom = 0.1f;
-
+    if(camera.zoom > 3.0f) camera.zoom = 3.0f;
     if(IsKeyPressed(KEY_O)){
       camera.target.x = 0;
       camera.target.y = 0;
@@ -29,9 +32,11 @@ int main(int argc,char *argv[]) {
     ClearBackground(BLACK);
     BeginMode2D(camera);
       ScreenGrid(camera,SPACING);
-      DrawMathFunction(camera);
+      DrawMathFunction(camera,argv[1]);
+    
       directions(camera);
     EndMode2D();
+      DrawText(TextFormat("Target: X:%.0f Y:%.0f", camera.target.x, -camera.target.y), 10, 10, 20, BLUE);
     EndDrawing();
   }
   CloseWindow();
