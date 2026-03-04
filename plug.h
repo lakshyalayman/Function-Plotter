@@ -12,17 +12,23 @@
 #define SPACING 40.0f
 #define N (3*WIDTH/SPACING + 1)
 
+extern int counta;
+
 void directions(Camera2D camera);
-void DrawMathFunction(Camera2D camera,char *stringFunction);
+void DrawMathFunction(Camera2D camera,char *stringFunction,int curr);
 void ScreenGrid(Camera2D camera,float spacing);
 
 #endif // !PLUG_H
+// #define PLUG_IMPLEMENTATION
 #ifdef PLUG_IMPLEMENTATION
 
-void DrawMathFunction(Camera2D camera,char *stringFunction) {
+void DrawMathFunction(Camera2D camera,char *stringFunction,int curr) {
   int width = GetScreenWidth();
   double x_var = 0;
   Vector2 points[width];
+  Vector2 bottomPoints[width];
+  Color color;
+  int count = 0;
   bool marker = false;
   te_variable vars[] = {
     {"x",&x_var}
@@ -34,14 +40,15 @@ void DrawMathFunction(Camera2D camera,char *stringFunction) {
       Vector2 worldPos = GetScreenToWorld2D((Vector2){ (float)i, 0 }, camera);
       x_var = worldPos.x / SPACING; 
       float y = te_eval(userFunction)*SPACING;
-      points[i] = (Vector2){ worldPos.x, -y }; 
+      points[i] = (Vector2){worldPos.x, -y }; 
     }
     te_free(userFunction);
-    if(!marker)DrawLineStrip(points, width,GOLD);
+    color = ColorFromHSV(360*((float)curr/counta),1.00,1.00);
+    DrawLineStrip(points, width,color);
   }else{
     int width = GetScreenWidth();
     int height = GetScreenHeight();
-    DrawText("code broke",(float)width/2,(float)height/2,30,RED);
+    DrawText("code broke :(",(float)width/2,(float)height/2,30,RED);
   }
 }
 
